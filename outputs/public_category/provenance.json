@@ -1,0 +1,32 @@
+{
+  "retrieved": "2026-10-25",
+  "project": "https://osf.io/5byhb/",
+  "authors": "Mack, Love & Preston (2016)",
+  "license": "CC BY 4.0",
+  "files": [
+    {
+      "name": "description.txt",
+      "url": "https://osf.io/download/57sxd/",
+      "sha256": "7b13273d6dbfac7eeed145036b670e2dbb917afaa7d607c7b5bb98cd93fd28bb",
+      "bytes": 1948
+    },
+    {
+      "name": "featureinfo.txt",
+      "url": "https://osf.io/download/jt5we/",
+      "sha256": "7fe9927522e4f50631a052c1a60e348740f601b87789fa75c5d38ab3a8486fec",
+      "bytes": 862
+    },
+    {
+      "name": "behaviour.zip",
+      "url": "https://osf.io/download/ymdfp/",
+      "sha256": "c2ab813cc0cc5f502911a77b91c99b88d0eefcef543b541250cebef8041cc44b",
+      "bytes": 119841
+    },
+    {
+      "name": "trialtiming.zip",
+      "url": "https://osf.io/download/25sj5/",
+      "sha256": "23f32f7633b908421ee319fbf622bfb28e8cdd0393e524d022a554028497cb39",
+      "bytes": 210158
+    }
+  ]
+}
