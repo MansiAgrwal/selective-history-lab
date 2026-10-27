@@ -1,0 +1,57 @@
+{
+  "status": "implementation pilot, not a powered coverage or sample-size study",
+  "arguments": {
+    "reps": 12,
+    "n": 120,
+    "workers": 4,
+    "starts": 2,
+    "out": "selective_history_lab/outputs/pilot",
+    "resume": true
+  },
+  "seconds_this_invocation": 0.24669671058654785,
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "base_config": {
+    "n": 120,
+    "blocks": 6,
+    "capacity": 18,
+    "epsilon": 0.1,
+    "initial": "skewed",
+    "gains": [
+      0.08,
+      0.045,
+      0.055,
+      0.04
+    ],
+    "losses": [
+      0.008,
+      0.008
+    ],
+    "initial_mastery": [
+      0.2,
+      0.2
+    ],
+    "guess": 0.25,
+    "slip": 0.1,
+    "heterogeneity": 0.8,
+    "aux_loading": 1.0,
+    "aux_sd": 0.8,
+    "aux_drift": 0.0,
+    "aux_subject_sd": 0.0,
+    "retention_loss": [
+      0.15,
+      0.15
+    ]
+  },
+  "known_to_fitter": [
+    "retention loss",
+    "equal mixture weights and specified heterogeneity support"
+  ],
+  "not_implemented": [
+    "human confidence",
+    "feature attention and generalization",
+    "fMRI haemodynamics",
+    "estimated heterogeneity",
+    "bootstrap intervals"
+  ]
+}
