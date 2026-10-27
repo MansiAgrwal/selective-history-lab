@@ -1,0 +1,19 @@
+{
+  "source": "https://osf.io/download/rzm7g/",
+  "project": "https://osf.io/n2mxu/",
+  "retrieved": "2026-10-25",
+  "sha256": "45ee082288c1bc59c8512168065e60cc8947da8c7b9a42d588f2ce19ad9e227d",
+  "source_bytes": 243437,
+  "participants_in_processed_aggregate": 300,
+  "test_rows": 9600,
+  "cells": 15,
+  "participants_per_cell": 20,
+  "test_rows_per_person": 32,
+  "original_confidence_scale": "0 to 10; ordinal, not assumed a probability",
+  "released_CONF_coding": "1 to 11; original processing script adds one",
+  "underexposure_label": "notpresented in the source means fewer than four training presentations, not necessarily zero",
+  "source_exclusion_pipeline_reproduced": false,
+  "new_causal_effect_estimated": false,
+  "raw_source_redistributed": false,
+  "license_note": "No project license recorded in inspected OSF metadata; downloader provided instead of raw-file redistribution"
+}
