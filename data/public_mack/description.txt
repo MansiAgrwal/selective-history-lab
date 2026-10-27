@@ -1,0 +1,58 @@
+Participants learned three category learning tasks during fMRI scanning. Each task consisted of 4 fMRI runs, each with 32 trials. Across these 32 trials, the 8 stimuli were repeated 3 times in random order. 
+
+NOTE: Subject 9's run 5 functional data (functional_5/bold.nii.gz) is corrupted and should be excluded from analyses. 
+
+Details for the behavioural data file format, task order, category structures of the tasks, and the imaging data are as follows:
+
+** behavioural data file columns ** 
+1. trial number (1-32)
+2. task (1-3)
+3. run (1-4)
+4. dimension 1
+5. dimension 2
+6. dimension 3
+7. answer (1 or 2)
+8. response (1 or 2)
+9. RT (ms)
+10. accuracy (0 or 1)
+
+
+** trial timing file columns **
+1. subject
+2. trial (1-32)
+2. task (1-3)
+3. run (1-4)
+4. stimulus onset
+5. feedback onset
+
+
+** order of task types **
+even subject numbers: type 6, type 1, type 2
+odd subject numbers: type 6, type 2, type 1
+
+
+** category structures **
+types 1, 2, and 6 from Shepard, Hovland, & Jenkins, 1961
+ stimulus dimension |        category
+dim 1  dim 2  dim 3 | type 1  type 2  type 6
+  0      0      0   |   1       1       1
+  0      0      1   |   1       2       2
+  0      1      0   |   1       2       2
+  0      1      1   |   1       1       1
+  1      0      0   |   2       1       2
+  1      0      1   |   2       2       1
+  1      1      0   |   2       2       1
+  1      1      1   |   2       1       2
+
+
+** features to dimension assignment **
+The featureinfo.txt file provides how the features were assigned to the three dimensions for each subject. 
+
+
+** imaging data **
+Within each participant data tar file are:
+  - 1mm-iso MPRAGE (highres.nii.gz)
+  - 2 coronally-oriented T2 (coronal1/2.nii.gz)
+  - Fieldmap (fieldmap_mag.nii.gz, fieldmap_phase.nii.gz)
+  - 12 functional timeseries (functional_{1..12}/bold.nii.gz
+NOTE: Subject 9's run 5 functional data (functional_5/bold.nii.gz) is corrupted and should be excluded from any analyses. 
