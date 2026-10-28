@@ -39,13 +39,20 @@ class ObservedExt:
     assigned_probability: np.ndarray
 
 
-def simulate_ext(c=Config(), rule='recency', seed=1, sensor='total', probe_reps=3, yoked=None, sensor_at='probes'):
-    """Simulate N learners. `yoked` is an (n, n_practice) array of practice actions to replay."""
+def simulate_ext(c=Config(), rule='recency', seed=1, sensor='total', probe_reps=3, yoked=None, sensor_at='probes',
+                 scheduled_exploration=True):
+    """Simulate N learners. `yoked` is an (n, n_practice) array of practice actions to replay.
+
+    sensor_at: 'probes' (one reading per probe block per channel, as in the pilot), 'practice' (one reading on every
+    practice trial) or 'practice_sparse' (the same number of readings as 'probes', placed on practice trials instead:
+    per practice segment, one reading for the total sensor or two for the skill sensor, at trials drawn uniformly
+    within the segment). scheduled_exploration=False makes the three scheduled trials of each block adaptive; their
+    positions are still drawn, so the random streams stay aligned with the default design."""
     if rule not in ('recency', 'balanced', 'random'):
         raise ValueError(rule)
     if sensor not in ('none', 'total', 'skill'):
         raise ValueError(sensor)
-    if sensor_at not in ('probes', 'practice'):
+    if sensor_at not in ('probes', 'practice', 'practice_sparse'):
         raise ValueError(sensor_at)
     if sensor == 'skill' and probe_reps < 1:
         raise ValueError('skill sensor needs at least two probe items per block')
@@ -62,6 +69,12 @@ def simulate_ext(c=Config(), rule='recency', seed=1, sensor='total', probe_reps=
         mats = [transition_matrix(c.gains, c.losses, e, u * c.heterogeneity) for e in range(3)]
         s = int(main.choice(4, p=initial_dist(c.initial_mastery)))
         hist, t, k_practice = [], 0, 0
+        sparse = set()
+        if sensor != 'none' and sensor_at == 'practice_sparse':
+            place = np.random.default_rng([seed, i, 3])          # separate stream: placement does not perturb learning
+            per_segment = 1 if sensor == 'total' else 2
+            for lo, hi in [(0, 18)] + [(18 + 12 * b, 30 + 12 * b) for b in range(c.blocks)]:
+                sparse.update(int(x) for x in place.choice(np.arange(lo, hi), per_segment, replace=False))
 
         def event(e, kind, phase, p=1.0, zkind=0):
             nonlocal s, t, k_practice
@@ -85,14 +98,14 @@ def simulate_ext(c=Config(), rule='recency', seed=1, sensor='total', probe_reps=
             e = int(yoked[i, k_practice]) if yoked is not None else e_default
             e = int(e)
             zkind = 0
-            if sensor != 'none' and sensor_at == 'practice':
+            if sensor != 'none' and (sensor_at == 'practice' or (sensor_at == 'practice_sparse' and k_practice in sparse)):
                 zkind = 1 if sensor == 'total' else {0: 2, 1: 3, 2: 1}[e]
             event(e, 1, phase, 1.0 if yoked is not None else p, zkind=zkind)
 
         def probe_block():
             for k, e in enumerate(np.tile(np.arange(3), probe_reps)):
                 kind = 0
-                if sensor_at == 'practice':
+                if sensor_at != 'probes':
                     event(int(e), 0, 1); continue
                 if sensor == 'total' and k == 0: kind = 1
                 if sensor == 'skill' and k == 0: kind = 2
@@ -104,7 +117,7 @@ def simulate_ext(c=Config(), rule='recency', seed=1, sensor='total', probe_reps=
             practice(int(e), 0)
         probe_block()
         for block in range(c.blocks):
-            positions = main.choice(12, 3, replace=False); order = main.permutation(3); scheduled = dict(zip(positions, order))
+            positions = main.choice(12, 3, replace=False); order = main.permutation(3); scheduled = dict(zip(positions, order)) if scheduled_exploration else {}
             for j in range(12):
                 if j in scheduled:
                     practice(int(scheduled[j]), 2)

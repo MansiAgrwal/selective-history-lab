@@ -94,5 +94,36 @@ class ExtensionChecks(unittest.TestCase):
                 np.testing.assert_array_equal(obs.zkind[obs.transition == 1], np.array([2, 3, 1])[obs.action[obs.transition == 1]])
 
 
+    def test_no_scheduled_exploration(self):
+        c = Config(n=25, epsilon=0.)
+        base_obs, base = simulate_ext(c, 'recency', 12, 'none')
+        obs, truth = simulate_ext(c, 'recency', 12, 'none', scheduled_exploration=False)
+        self.assertEqual((base_obs.phase == 2).sum(), 25 * 3 * c.blocks)              # the default design schedules 3 per block
+        self.assertEqual((obs.phase == 2).sum(), 0)                                    # none remain
+        self.assertEqual((obs.phase == 3).sum(), 25 * 12 * c.blocks)                   # every block trial is adaptive
+        np.testing.assert_array_equal(truth['type'], base['type'])                     # same learners
+        np.testing.assert_array_equal(truth['practice_actions'][:, :18], base['practice_actions'][:, :18])   # same initial practice
+
+    def test_practice_sparse_sensor(self):
+        c = Config(n=15)
+        base = simulate_ext(c, 'recency', 13, 'none')
+        segments = [(0, 18)] + [(18 + 12 * b, 30 + 12 * b) for b in range(c.blocks)]
+        for kind, per_segment in (('total', 1), ('skill', 2)):
+            obs, truth = simulate_ext(c, 'recency', 13, kind, sensor_at='practice_sparse')
+            np.testing.assert_array_equal(truth['practice_actions'], base[1]['practice_actions'])   # same learners and practice
+            np.testing.assert_array_equal(truth['before'], base[1]['before'])                        # same latent trajectories
+            probes_obs = simulate_ext(c, 'recency', 13, kind, sensor_at='probes')[0]
+            self.assertEqual((obs.zkind > 0).sum(), (probes_obs.zkind > 0).sum())                     # equal number of readings
+            for i in range(c.n):
+                prac = np.where(obs.transition[i] == 1)[0]
+                read = np.where(obs.zkind[i] > 0)[0]
+                self.assertTrue(np.isin(read, prac).all())                                           # all on practice trials
+                k = np.searchsorted(prac, read)
+                for lo, hi in segments:
+                    self.assertEqual(((k >= lo) & (k < hi)).sum(), per_segment)
+                if kind == 'skill':
+                    np.testing.assert_array_equal(obs.zkind[i, read], np.array([2, 3, 1])[obs.action[i, read]])
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

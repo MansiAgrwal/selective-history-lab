@@ -119,3 +119,31 @@ if __name__ == '__main__' and sys.argv[1] == 'e3c':
     print(f'Experiment 3c: {n} complete replications per condition')
     print(out[['condition', 'contrast', 'bias', 'bias_mcse', 'rmse', 'coverage_model', 'mean_width_model', 'width_ratio_vs_pilot',
                'width_ratio_mcse', 'share_excluding_zero']].round(4).to_string(index=False))
+
+
+def experiment3d():
+    """Equal numbers of readings at probe blocks (Experiment 3) vs on practice trials (3d), with all-trial readings (3c)
+    for reference; paired on the same replications against the pilot design."""
+    load = lambda name: [json.loads(l) for l in (RES / name).read_text().splitlines()]
+    rows = load('e3d_fits.jsonl'); reps = sorted({r['rep'] for r in rows})
+    probe_rows = [r for r in load('e3_fits.jsonl') if r['rep'] in reps and r['condition'] in
+                  ('behaviour, 9 probe items', 'total sensor, SD 0.4', 'total sensor, SD 0.8', 'skill sensor, SD 0.4', 'skill sensor, SD 0.8')]
+    all_trial_rows = [r for r in load('e3c_fits.jsonl') if r['rep'] in reps]
+    df = flatten(probe_rows + rows + all_trial_rows, ('rep', 'condition', 'sensor', 'probe_items', 'sensor_sd'))
+    complete = df.groupby('rep').condition.nunique(); df = df[df.rep.isin(complete[complete == complete.max()].index)]
+    out = df.groupby(['condition', 'contrast'], sort=False).apply(describe, include_groups=False).reset_index()
+    base = df[df.condition == 'behaviour, 9 probe items'].set_index(['rep', 'contrast']).width_model
+    ratio = df.set_index(['rep', 'contrast']).assign(ratio=lambda d: d.width_model / base.reindex(d.index).values).reset_index()
+    r = ratio.groupby(['condition', 'contrast'], sort=False).ratio.agg(['mean', lambda x: x.std(ddof=1) / np.sqrt(x.notna().sum())])
+    r.columns = ['width_ratio_vs_pilot', 'width_ratio_mcse']
+    out = out.merge(r.reset_index(), on=['condition', 'contrast'])
+    out.to_csv(RES / 'e3d_summary.csv', index=False)
+    return out, int(df.rep.nunique())
+
+
+if __name__ == '__main__' and sys.argv[1] == 'e3d':
+    pd.set_option('display.width', 250); pd.set_option('display.max_columns', 30)
+    out, n = experiment3d()
+    print(f'Experiment 3d: {n} complete replications per condition')
+    print(out[['condition', 'contrast', 'bias', 'rmse', 'coverage_model', 'coverage_model_mc95', 'mean_width_model', 'width_ratio_vs_pilot',
+               'width_ratio_mcse', 'share_excluding_zero']].round(4).to_string(index=False))
