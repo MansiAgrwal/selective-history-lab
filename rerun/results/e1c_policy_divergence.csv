@@ -1,0 +1,4 @@
+analysis,capacity,decisions,p_A_recency,p_A_balanced,max_abs_difference_p_A,tv_median,tv_p90,tv_p99,tv_max
+constructed histories (search),18,200000,0.2787878787878788,0.6732881866064709,0.39450030781859213,,,,
+decisions reached by simulated recency learners,3,27000,,,,0.07499999999999993,0.11538461538461539,0.15000000000000002,0.19285714285714284
+decisions reached by simulated recency learners,18,27000,,,,0.04644727000747942,0.11666666666666661,0.1951217117505714,0.4036363636363637
